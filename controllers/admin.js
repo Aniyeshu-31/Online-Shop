@@ -36,7 +36,6 @@ exports.postAddProduct = (req, res, next) => {
     });
   }
   const errors = validationResult(req);
-
   if (!errors.isEmpty()) {
     console.log(errors.array());
     return res.status(422).render('admin/edit-product', {
@@ -46,7 +45,6 @@ exports.postAddProduct = (req, res, next) => {
       hasError: true,
       product: {
         title: title,
-        imageUrl: imageUrl,
         price: price,
         description: description
       },
@@ -56,7 +54,6 @@ exports.postAddProduct = (req, res, next) => {
   }
 
   const imageUrl = image.path;
-
   const product = new Product({
     // _id: new mongoose.Types.ObjectId('5badf72403fd8b5be0366e81'),
     title: title,
