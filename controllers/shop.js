@@ -4,6 +4,7 @@ const fs = require("fs");
 const items_per_page = 1;
 const pdfDocument = require("pdfkit");
 const path = require("path");
+const product = require("../models/product");
 const stripe = require("stripe")(
   "sk_test_51Mpme7SHEfH1Sdnxgn1ENIWVqX9pKZPaiRwndHBqv0dQ1vr9zLBk6kNO17p6pAc6UG7Rw6BfiaGjHHQphO3zijcB00Wi5xdz4j"
 );
@@ -308,3 +309,77 @@ exports.getInvoice = (req, res, next) => {
     // }).catch(err=>next(err));
   });
 };
+exports.getProduct = (req, res, next) => {
+  const prodId = req.params.productId;
+  Product.findById(prodId)
+    .then((product) => {
+      res.render("shop/product-detail", {
+        product: product,
+        pageTitle: product.title,
+        path: "/products",
+      });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+}
+
+exports.getSearch=(req,res,next)=>{
+  Product.find().then(product=>{
+    // console.log(product);
+  }).catch(err=>{
+    console.log(err);
+  });
+  res.render('shop/search', {
+    pageTitle: 'Search a Product',
+    path: '/search',
+    products:product,
+    hasError: false,
+    errorMessage: null,
+    editing:false,
+    validationErrors: []
+  });
+}
+
+exports.getSearchProduct = (req,res,next)=>{
+  const title = req.query.title;
+  // console.log(title);
+  const page = +req.query.page || 1;
+  Product.find().then(product=>{
+    // console.log(product);
+  }).catch(err=>{
+    console.log(err);
+  });
+  let totalItems;
+  Product.find()
+    .countDocuments()
+    .then((numProducts) => {
+      totalItems = numProducts;
+      return Product.find()
+        .skip((page - 1) * items_per_page)
+        .limit(items_per_page);
+    })
+    .then((products) => {
+      res.render("shop/getsearchedProduct", {
+        prods: products,
+        pageTitle: "Products",
+        path: "/products",
+
+        // totalProducts:totalItems,
+        currentPage: page,
+        hasNextPage: items_per_page * page < totalItems,
+        hasPreviousPage: page > 1,
+        nextPage: page + 1,
+        prevPage: page - 1,
+        lastPage: Math.ceil(totalItems / items_per_page),
+      });
+    })
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
+};
+

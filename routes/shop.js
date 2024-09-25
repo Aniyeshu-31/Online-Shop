@@ -30,4 +30,8 @@ router.get('/checkout/cancel',isAuth,shopController.getCheckout);
 router.get('/orders', isAuth, shopController.getOrders);
 
 router.get('/orders/:orderId', isAuth,shopController.getInvoice);
+
+router.get('/search',isAuth,shopController.getSearch);
+
+router.get('/search/products',isAuth,shopController.getSearchProduct);
 module.exports = router;
